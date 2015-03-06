@@ -1,2 +1,2 @@
-# mobile-single-page-solution
-a mobile single page solution
+# mobile-page-solution-core
+a simple mobile single page solution
