@@ -1,7 +1,7 @@
 {
-  "name": "mobile-single-page-solution",
+  "name": "mpage",
   "version": "1.0.0",
-  "description": "a simple mobile single page solution",
+  "description": "core for one simple mobile single page solution",
   "author": "Jofix",
   "devDependencies": {
   }
