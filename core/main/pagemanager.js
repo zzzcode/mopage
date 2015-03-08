@@ -3,10 +3,10 @@
  * @author lzhspace@gmail.com
  */
 
-define(function(require, exports, module) {
+define("core/main/pagemanager", function(require, exports, module) {
 	var router = require('core/main/router');
 	var util = require('core/lib/util');
-	var config = require('core/config/index').getConfig();
+	var config = require('core/config').getConfig();
 	var Page = require('core/main/page');
 	var loader = window.loader;
 	var event = require('core/lib/event');

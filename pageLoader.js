@@ -2,7 +2,7 @@
  * @fileoverview 初始页面的加载器
  * @author lzhspace@gmail.com
  */
-var createLoader = (function(win, doc, undefined) {
+var buildLoader = (function(win, doc, undefined) {
 
     /**
      * @constructor
@@ -487,6 +487,9 @@ var createLoader = (function(win, doc, undefined) {
         if(!target) return false;
         return Object.prototype.toString.call(target) === '[object Array]';
     }
+
+    // 往window对象写入loader引用
+    win.loader = Loader;
 
     return Loader;
 })(window, document);

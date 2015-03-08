@@ -5,7 +5,7 @@
  * @author lzhspace@gmail.com
  */
  
-define(function(require, exports, module) {
+define("core/lib/event", function(require, exports, module) {
 	var emitter = require('core/lib/emitter');
 
 	var eventAttr = 'data-event', globalNamespace = 'global';

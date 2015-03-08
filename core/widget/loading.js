@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define("core/widget/loading", function(require, exports, module) {
 	var util = require('core/lib/util');
 
 	var _tmpl = {

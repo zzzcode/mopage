@@ -2,7 +2,7 @@
  * @fileoverview 工具模块
  * @author lzhspace@gmail.com 
  */
-define(function(require, exports, module) {
+define("core/lib/util", function(require, exports, module) {
     var csrfCode;
 
     var tempDiv = document.createElement('div');

@@ -3,10 +3,10 @@
  * @author evanyuan, lzhspace@gmail.com
  */
 
-define(function(require, exports, module) {
+define("core/main/router", function(require, exports, module) {
 	var emitter = require('core/lib/emitter');
 	var event = require('core/lib/event');
-	var config = require('core/config/index').getConfig();
+	var config = require('core/config').getConfig();
 	var routeRule = '/*controller(/*action)(/*p1)(/*p2)(/*p3)(/*p4)';
 	var debugMark = 'debug_online';
 	var hashMark = '#!';

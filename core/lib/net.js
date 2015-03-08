@@ -2,7 +2,7 @@
  * @fileoverview 通信模块
  * @author lzhspace@gmail.com 
  */
-define(function(require, exports, module) {
+define("core/lib/net", function(require, exports, module) {
 	var util = require('core/lib/util');
     var emitter = require('core/lib/emitter');
 

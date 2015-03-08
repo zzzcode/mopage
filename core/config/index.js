@@ -4,7 +4,7 @@
  * @author Jofixli
  */
 
-define(function(require, exports, module) {
+define("core/config", function(require, exports, module) {
 	var util = require('core/lib/util');
 
 	var config = {

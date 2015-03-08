@@ -2,7 +2,7 @@
  * @fileoverview 事件注入
  * @author lzhspace@gmail.com
  */
-define(function(require, exports, module) {
+define("core/lib/emitter", function(require, exports, module) {
 	var util = require('core/lib/util');
 	var bindFunctionName = 'on', emitFunctionName = 'emit', moduleInjectName = '__module_event__';
 	var eventsContainer = {};

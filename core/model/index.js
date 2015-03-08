@@ -2,7 +2,7 @@
  * @fileoverview 数据层，封装ajax请求
  * @author lzhspace@gmail.com
  */
-define(function(require, exports, module) {
+define("core/model", function(require, exports, module) {
 	var net = require('core/lib/net');
 	var util = require('core/lib/util');
 	var emitter = require('core/lib/emitter');

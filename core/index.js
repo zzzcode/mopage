@@ -3,13 +3,13 @@
  * @author lzhspace@gmail.com
  */
 
-define(function(require, exports, module) {
+define("core", function(require, exports, module) {
 	var router = require('core/main/router');
 	var pageManager = require('core/main/pagemanager');
 	var event = require('core/lib/event');
 	var commonLayout = require('core/layout/common');
 	var util = require('core/lib/util');
-	var configManager = require('core/config/index');
+	var configManager = require('core/config');
 
 	var startup = function() {
 		pageManager.init();

@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define("core/widget/tip", function(require, exports, module) {
 	var event = require('core/lib/event');
 	var util = require('core/lib/util');
 

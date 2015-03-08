@@ -2,9 +2,9 @@
  * @fileoverview 页面包装类，维持页面的状态，负责加载以及销毁页面
  * @author lzhspace@gmail.com
  */
-define(function(require, exports, module) {
+define("core/main/page", function(require, exports, module) {
 	var event = require('core/lib/event');
-	var config = require('core/config/index').getConfig();
+	var config = require('core/config').getConfig();
 	var loading = require('core/widget/loading');
 	var util = require('core/lib/util');
 

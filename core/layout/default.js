@@ -2,7 +2,7 @@
  * @fileoverview 默认布局
  * @author lzhspace@gmail.com
  */
-define(function(require, exports, module) {
+define("core/layout/default", function(require, exports, module) {
 	var util = require('core/lib/util');
 	var _tmpl = {
 		style: TEMPLATE.INNER_STYLE,
