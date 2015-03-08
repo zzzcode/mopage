@@ -2,6 +2,7 @@
  * @fileoverview 初始页面的加载器
  * @author lzhspace@gmail.com
  */
+<script type="text/javascript">
 var buildLoader = (function(win, doc, undefined) {
 
     /**
@@ -493,3 +494,4 @@ var buildLoader = (function(win, doc, undefined) {
 
     return Loader;
 })(window, document);
+</script>
