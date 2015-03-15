@@ -5,8 +5,8 @@
 
 define("core/main/pagemanager", function(require, exports, module) {
 	var router = require('core/main/router');
-	var util = require('core/lib/util');
-	var config = require('core/config').getConfig();
+	var dom = require('core/lib/dom');
+	var config = require('core/config/index');
 	var Page = require('core/main/page');
 	var loader = window.loader;
 	var event = require('core/lib/event');
@@ -23,10 +23,6 @@ define("core/main/pagemanager", function(require, exports, module) {
 		 * @method 模块初始化
 		 */
 		init: function() {
-			this.pagesWrapper = util.dom(config.pagesWrapper);
-			if(!this.pagesWrapper) {
-				throw 'get pages wrapper error';
-			}
 			this.initMaskPage();
 		},
 
@@ -34,7 +30,11 @@ define("core/main/pagemanager", function(require, exports, module) {
 			this.maskPage = new Page('maskPage');
 			this.maskPage.addWrapClass('mask-page');
 			this.maskPage.hide();
-			this.pagesWrapper.appendChild(this.maskPage.dom);
+			this.pagesWrapper.appendChild(this.maskPage.getWrapper());
+		},
+
+		setPagesWrapper: function(pagesWrapper) {
+			this.pagesWrapper = pagesWrapper;
 		},
 
 		/**
@@ -56,7 +56,7 @@ define("core/main/pagemanager", function(require, exports, module) {
 					this.destroyPage(pageId);
 					var toPage = new Page(pageId);
 					pagesContainer[pageId] = toPage;
-					this.pagesWrapper.appendChild(toPage.dom);
+					this.pagesWrapper.appendChild(toPage.getWrapper());
 					loader.loadModule(pageModule, function(status) {
 						if(status == loader.Status.SUCCESS) {
 							require.async(pageModule, function(pageCore) {
@@ -154,20 +154,20 @@ define("core/main/pagemanager", function(require, exports, module) {
 		 */
 		animate: function(fromPage, toPage, isBack) {
 			var pageTopClass = 'page-ontop', maskPage = this.maskPage;
-			var toPageDom = toPage.getDom(), fromPageDom = fromPage.getDom(), maskPageDom = maskPage.getDom();
+			var toPageWrapper = toPage.getWrapper(), fromPageWrapper = fromPage.getWrapper(), maskPageWrapper = maskPage.getWrapper();
 			fromPage.deactive();
 			toPage.active();
 			if(isBack) {
-				util.transform(maskPageDom, 'opacity(0.5)');
+				dom.transform(maskPageWrapper, 'opacity(0.5)');
 				fromPage.addWrapClass(pageTopClass);
 				fromPage.emit('animationstart');
 				toPage.show();
 				maskPage.show();
-				util.applyRender();
-				util.transform(maskPageDom, 'opacity(0)', 250, function() {
+				dom.applyRender();
+				dom.transform(maskPageWrapper, 'opacity(0)', 250, function() {
 					maskPage.hide();
 				});
-				util.transform(fromPageDom, 'translateX(' + util.support.windowWidth + 'px)', 250, function() {
+				dom.transform(fromPageWrapper, 'translateX(' + dom.support.windowWidth + 'px)', 250, function() {
 					fromPage.hide();
 					toPage.resume();
 					fromPage.emit('animationend');
@@ -176,17 +176,17 @@ define("core/main/pagemanager", function(require, exports, module) {
 				});
 			}
 			else {
-				util.transform(toPageDom, 'translateX(' + (util.support.windowWidth - 2) + 'px)');
-				util.transform(maskPageDom, 'opacity(0)');
+				dom.transform(toPageWrapper, 'translateX(' + (dom.support.windowWidth - 2) + 'px)');
+				dom.transform(maskPageWrapper, 'opacity(0)');
 				toPage.addWrapClass(pageTopClass);
 				toPage.emit('animationstart');
 				toPage.show();
 				maskPage.show();
-				util.applyRender();
-				util.transform(maskPageDom, 'opacity(0.5)', 250, function() {
+				dom.applyRender();
+				dom.transform(maskPageWrapper, 'opacity(0.5)', 250, function() {
 					maskPage.hide();
 				});
-				util.transform(toPageDom, 'translateX(0)', 250, function() {
+				dom.transform(toPageWrapper, 'translateX(0)', 250, function() {
 					fromPage.hide();
 					toPage.removeWrapClass(pageTopClass);
 					toPage.emit('animationend');

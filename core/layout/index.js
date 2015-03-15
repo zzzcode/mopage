@@ -2,16 +2,17 @@
  * @fileoverview 默认布局
  * @author lzhspace@gmail.com
  */
-define("core/layout/default", function(require, exports, module) {
-	var util = require('core/lib/util');
+define("core/layout/index", function(require, exports, module) {
+	var dom = require('core/lib/dom');
 	var _tmpl = {
 		style: TEMPLATE.INNER_STYLE,
 		main: TEMPLATE.MAIN
 	}
 	var layout = {
+		wrapper: '#pagesWrapper',
 		render: function() {
-			util.insertStyle(_tmpl.style);
-			util.appendHtml(document.body, _tmpl.main);
+			dom.insertStyle(_tmpl.style);
+			dom.appendHtml(document.body, _tmpl.main);
 		}
 	}
 

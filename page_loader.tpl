@@ -1,23 +1,22 @@
-/**
- * @fileoverview 初始页面的加载器
- * @author lzhspace@gmail.com
- */
 <script type="text/javascript">
 var buildLoader = (function(win, doc, undefined) {
 
     /**
      * @constructor
      */
-    var Loader = function(userConfig) {
-        if(typeof userConfig !== 'object') throw 'no user config';
+    var Loader = function(loaderConfig) {
+        if(typeof loaderConfig !== 'object') throw 'no loader config';
 
-        config = makeConfig(userConfig);
-        moduleVersion = parseFileVersion(config.fileVersion);
+        config = makeConfig(loaderConfig);
         storable = config.debug ? false : checkStorable();
 
         this.Status = Status;
-        this.loadModule = loadModule;
         this.startup = startup;
+        this.loadModule = loadModule;
+        this.checkModuleExist = checkModuleExist;
+
+        // 往window对象写入loader引用
+        win.loader = this;
 
         return this;
     }
@@ -53,19 +52,13 @@ var buildLoader = (function(win, doc, undefined) {
     var config;
 
     /**
-     * 所有模块的版本映射表
-     * @type {object}
-     */
-    var moduleVersion;
-
-    /**
      * 是否使用本地存储
      * @type {boolean}
      */
     var storable;
 
     /**
-     * seajs原来的define函数
+     * 引用seajs原来的define函数
      * @type {function}
      */
     var oriSeajsDefine;
@@ -77,6 +70,7 @@ var buildLoader = (function(win, doc, undefined) {
     var makeConfig = function(userConfig) {
         var config = {
             debug: win.location.href.indexOf('debug_online') > 0,
+            appName: 'app',
             entryModule: 'core/index',
             seajsModule: 'core/lib/sea'
         }
@@ -84,68 +78,73 @@ var buildLoader = (function(win, doc, undefined) {
         /**
          * cdn地址
          */
-         if(userConfig.cdnHost === undefined) throw '[cdnHost] missing';
+         if(!userConfig.cdnHost) throw '[cdnHost] missing';
          config.cdnHost = userConfig.cdnHost;
 
         /**
          * cdn路径
          */
-        if(userConfig.cdnPath === undefined) throw '[cdnPath] missing';
+        if(!userConfig.cdnPath) throw '[cdnPath] missing';
         config.cdnPath = userConfig.cdnPath;
 
         /**
          * cdn合并请求标记
          */
-        if(userConfig.combineMark === undefined) throw '[combineMark] missing';
+        if(!userConfig.combineMark) throw '[combineMark] missing';
         config.combineMark = userConfig.combineMark;
 
         /**
          * @name 记录JS文件版本
          */
-        if(userConfig.fileVersion === undefined) throw '[fileVersion] missing';
-        config.fileVersion = userConfig.fileVersion;
+        if(!userConfig.fileMap) throw '[fileVersion] missing';
+        config.moduleFileMap = userConfig.moduleFileMap;
 
         /**
          * 记录模块依赖信息
          * @description 用以预加载模块
          */
-        if(userConfig.moduleDeps === undefined) throw '[moduleDeps] missing';
+        if(!userConfig.moduleDeps) throw '[moduleDeps] missing';
         config.moduleDeps = userConfig.moduleDeps;
 
         /**
          * 是否debug模式
-         * @description 
+         * @description 只要有一个为true即为true
          */
-        (userConfig.debug !== undefined) && (config.debug = userConfig.debug);
+        config.debug = config.debug || !!userConfig.debug;
+
+        /**
+         * app名称（模块前缀）
+         */
+        userConfig.appName && (config.appName = userConfig.appName);
 
         /**
          * 入口模块
          */
-        (userConfig.entryModule !== undefined) && (config.entryModule = userConfig.entryModule);
+        userConfig.entryModule && (config.entryModule = userConfig.entryModule);
 
         /**
          * 关键模块预加载
          * @description 预加载模块名字，支持“*”通配，单一个“*”表示所有模块
          */
-        (userConfig.keyModules !== undefined) && (config.keyModules = userConfig.keyModules);
+        userConfig.keyModules && (config.keyModules = userConfig.keyModules);
 
         /**
          * 关键页面预加载
          * @description 此预加载变量基于页面路径，命中以下pathname会预先加载
          */
-        (userConfig.keyPaths !== undefined) && (config.keyPaths = userConfig.keyPaths);
+        userConfig.keyPaths && (config.keyPaths = userConfig.keyPaths);
 
         /**
          * seajs模块
          * @description 不建议修改
          */
-        (userConfig.seajsModule !== undefined) && (config.seajsModule = userConfig.seajsModule);
+        userConfig.seajsModule && (config.seajsModule = userConfig.seajsModule);
 
         return config;
     }
 
     /**
-     * 开始入口
+     * 执行入口
      */
     var startup = function() {
         win.define = define;
@@ -189,8 +188,8 @@ var buildLoader = (function(win, doc, undefined) {
         }
         seajsMaker.call(win);
         var mapData = [];
-        for(var key in moduleVersion) {
-            mapData.push([ key, moduleVersion[key].replace(/.js$/, '') ]);
+        for(var key in config.moduleFileMap) {
+            mapData.push([ key, config.moduleFileMap[key].replace(/.js$/, '') ]);
         }
         seajs.config({ 
             base: config.cdnHost + config.cdnPath,
@@ -208,19 +207,6 @@ var buildLoader = (function(win, doc, undefined) {
         win.defineSeajs = null;
         seajsMaker = null;
     }
-    
-
-    /**
-     * 解释version file
-     * @param {Object} jsVersion
-     */
-    var parseFileVersion = function(fileVersion) {
-        var moduleVersion = {};
-        for(var key in fileVersion) {
-            moduleVersion[key.replace(/\.js$/, '').replace(/\./g, '/')] = fileVersion[key];
-        }
-        return moduleVersion;
-    }
 
     /**
      * 获取初始加载的模块
@@ -231,7 +217,7 @@ var buildLoader = (function(win, doc, undefined) {
             for(var i = 0, one; one = config.keyModules[i]; i++) {
                 if(one.indexOf('*') >= 0) {
                     reg = new RegExp(one.replace(/\*/g, '\\w+'));
-                    for(var module in moduleVersion) {
+                    for(var module in config.moduleFileMap) {
                         if(module == config.seajsModule) continue;
                         if(reg.test(module)) {
                             modules.push(module);
@@ -246,6 +232,7 @@ var buildLoader = (function(win, doc, undefined) {
         if(typeof config.keyPaths == 'object' && config.keyPaths[win.location.pathname]) {
             modules.push(config.keyPaths[win.location.pathname]);
         }
+
         return modules;
     }
 
@@ -265,8 +252,8 @@ var buildLoader = (function(win, doc, undefined) {
         !loadComplete.enterCount && (loadComplete.enterCount = 0);
         loadComplete.enterCount++;
         if(loadComplete.enterCount == 2) {
-            seajs.use(config.entryModule, function(main) {
-                main();
+            seajs.use(config.entryModule, function(entry) {
+                entry(config.appName);
             });
         }
     }
@@ -277,7 +264,12 @@ var buildLoader = (function(win, doc, undefined) {
      * @param {function} cb
      */ 
     var loadModule = function(modules, cb) {
-        if(moduleExist(modules)) {
+        var result = checkModuleExist(modules);
+        if(result.notExistModules.length) {
+            console.error('modules[' + result.notExistModules.join(',') + '] do not exist');
+            cb(Status.NOT_FOUND);
+        }
+        else {
             var depsMap = parseDependencies(modules);
             var needLoadModules = [];
             for(var module in depsMap) {
@@ -298,25 +290,30 @@ var buildLoader = (function(win, doc, undefined) {
                 cb(Status.SUCCESS);
             }
         }
-        else {
-            cb(Status.NOT_FOUND);
-        }
     }
 
     /**
      * 检查模块是否存在
      * @param {Array|String} module
      */
-    var moduleExist = function(module) { 
+    var checkModuleExist = function(module) {
+        var existModules = [], notExistModules = [];
         if(!isArray(module)) {
-            module = [module];
-        }
-        for(var i = 0, one; one = module[i]; i++) {
-            if(!resolve(one)) {
-                return false;
+            if(!resolve(module)) {
+                notExistModules.push(module);
             }
         }
-        return true;
+        else {
+            for(var i = 0, one; one = module[i]; i++) {
+                if(resolve(one)) {
+                     existModules.push(one);
+                }
+                else {
+                    notExistModules.push(one);
+                }
+            }
+        }
+        return { existModules: existModules, notExistModules: notExistModules };
     }
 
     /**
@@ -359,7 +356,7 @@ var buildLoader = (function(win, doc, undefined) {
     }
 
     var resolve = function(module) {
-        return moduleVersion[module];
+        return config.moduleFileMap[module];
     }
 
     var checkStorable = function() {
@@ -488,9 +485,6 @@ var buildLoader = (function(win, doc, undefined) {
         if(!target) return false;
         return Object.prototype.toString.call(target) === '[object Array]';
     }
-
-    // 往window对象写入loader引用
-    win.loader = Loader;
 
     return Loader;
 })(window, document);

@@ -1,6 +1,6 @@
 define("core/widget/tip", function(require, exports, module) {
 	var event = require('core/lib/event');
-	var util = require('core/lib/util');
+	var dom = require('core/lib/dom');
 
 	var _tmpl = {
 		main: TEMPLATE.MAIN
@@ -14,10 +14,10 @@ define("core/widget/tip", function(require, exports, module) {
 			if(curTip) {
 				tipManager.hide();
 			}
-			util.transform(curTip[0], 'translateY(-100%)');
-			util.appendHtml(document.body, util.tmpl(_tmpl.main, { text: text }));
-			util.applyRender();
-			util.transform(curTip[0], 'translateY(0)', 200);
+			dom.transform(curTip[0], 'translateY(-100%)');
+			dom.appendHtml(document.body, dom.tmpl(_tmpl.main, { text: text }));
+			dom.applyRender();
+			dom.transform(curTip[0], 'translateY(0)', 200);
 			clearTimeout(timer);
 			timer = setTimeout(function() {
 				tipManager.hide()
@@ -27,7 +27,7 @@ define("core/widget/tip", function(require, exports, module) {
 			clearTimeout(timer);
 			var _cur = curTip;
 			if(!_cur) return;
-			util.transform(_cur[0], 'translateY(-100%)', 200, function() {
+			dom.transform(_cur[0], 'translateY(-100%)', 200, function() {
 				this.parent.removeChild(this);
 			});
 		}

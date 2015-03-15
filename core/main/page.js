@@ -4,9 +4,9 @@
  */
 define("core/main/page", function(require, exports, module) {
 	var event = require('core/lib/event');
-	var config = require('core/config').getConfig();
+	var config = require('core/config/index');
 	var loading = require('core/widget/loading');
-	var util = require('core/lib/util');
+	var dom = require('core/lib/dom');
 
 	var Page = function(pageId) {
 		this.pageId = pageId;
@@ -20,10 +20,9 @@ define("core/main/page", function(require, exports, module) {
 	Page.Status = {
 		LOADING: 1, 	// 加载中
 		LOADED: 2, 		// 加载完毕,并初始化完成
-		READY: 3, 		// 页面已展示
-		NOT_EXIST: 4, 	// 页面不存在
-		ERROR: 5, 		// 页面加载错误
-		DESTROY: 6		// 已销毁
+		NOT_EXIST: 3, 	// 页面不存在
+		ERROR: 4, 		// 页面加载错误
+		DESTROY: 5		// 已销毁
 	}
 
 	/**
@@ -32,7 +31,7 @@ define("core/main/page", function(require, exports, module) {
 	Page.prototype.init = function() {
 		var section = document.createElement('section');
 		section.innerHTML = loading.getHtml();
-		this.dom = section;
+		this.wrapper = section;
 	}
 
 	/**
@@ -41,13 +40,14 @@ define("core/main/page", function(require, exports, module) {
 	 * @param {Array} params 参数数组
 	 */
 	Page.prototype.loadPageCore = function(pageCore, params) {
+		if(this.status != Page.Status.LOADING) return;
 		this.pageCore = pageCore;
 		this.params = params;
 		if(pageCore.wrapClass) {
-			util.setClass(this.dom, pageCore.wrapClass);
+			dom.addClass(this.wrapper, pageCore.wrapClass);
 		}
 		pageCore.init({
-			wrapper: this.dom,
+			wrapper: this.wrapper,
 			params: params,
 			pageId: this.pageId
 		});
@@ -64,14 +64,14 @@ define("core/main/page", function(require, exports, module) {
 	 * @method 显示页面
 	 */
 	Page.prototype.show = function() {
-		this.dom.style.display = 'block';
+		this.wrapper.style.display = 'block';
 	}
 
 	/**
 	 * @method 隐藏页面
 	 */
 	Page.prototype.hide = function() {
-		this.dom.style.display = 'none';
+		this.wrapper.style.display = 'none';
 	}
 
 	/**
@@ -79,7 +79,7 @@ define("core/main/page", function(require, exports, module) {
 	 * @param {String} className 样式类
 	 */
 	Page.prototype.addWrapClass = function(className) {
-		util.setClass(this.dom, className);
+		dom.addClass(this.wrapper, className);
 	}
 
 	/**
@@ -87,15 +87,15 @@ define("core/main/page", function(require, exports, module) {
 	 * @param {String} className 样式类
 	 */
 	Page.prototype.removeWrapClass = function(className) {
-		util.setClass(this.dom, className, true);
+		dom.removeClass(this.wrapper, className);
 	}
 
 	/**
-	 * @method 获取页面的DOM引用
+	 * @method 获取页面的包装DOM引用
 	 * @return {HTMLElement} 页面最外层DOM引用
 	 */
-	Page.prototype.getDom = function() {
-		return this.dom;
+	Page.prototype.getWrapper = function() {
+		return this.wrapper;
 	}
 
 	/**
@@ -103,7 +103,7 @@ define("core/main/page", function(require, exports, module) {
 	 */
 	Page.prototype.render404 = function() {
 		this.status = Page.Status.NOT_EXIST;
-		this.dom.innerHTML = config.html404;
+		this.wrapper.innerHTML = config.html404;
 	}
 
 	/**
@@ -111,7 +111,7 @@ define("core/main/page", function(require, exports, module) {
 	 */
 	Page.prototype.renderError = function() {
 		this.status = Page.Status.ERROR;
-		this.dom.innerHTML = config.htmlError;
+		this.wrapper.innerHTML = config.htmlError;
 	}
 
 	/**
@@ -119,10 +119,10 @@ define("core/main/page", function(require, exports, module) {
 	 */
 	Page.prototype.destroy = function() {
 		this.pageCore && this.pageCore.destroy && this.pageCore.destroy();
-		this.dom.parent.removeChild(this.dom);
+		this.wrapper.parent.removeChild(this.wrapper);
 		event.removeEventsByNamespace(this.pageId);
 		this.status = Page.Status.DESTROY;
-		this.dom = null;
+		this.wrapper = null;
 	}
 
 	Page.prototype.active = function() {
@@ -131,9 +131,9 @@ define("core/main/page", function(require, exports, module) {
 
 	Page.prototype.resume = function() {
 		this.emit('resume');
-		if(this.status !== Page.Status.READY) {
+		if(!this.hasReady) {
 			this.emit('ready');
-			this.status = Page.Status.READY;
+			this.hasReady = true;
 		}
 	}
 
@@ -178,7 +178,7 @@ define("core/main/page", function(require, exports, module) {
 		var funcName = 'on' + eventName;
 		if(this.pageCore[funcName]) {
 			this.pageCore[funcName]();
-		}	
+		}
 	}
 
 	module.exports = Page;

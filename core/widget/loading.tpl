@@ -1,4 +1,4 @@
-<TEMPLATE name="MAIN">
+<TEMPLATE id="MAIN">
 <div style="position:relative;width:100%;height:50%;margin-bottom:<%=0-wrapHeight/2%>px"></div>
 <div style="width:<%=wrapWidth%>px;height:<%=wrapHeight%>px;-webkit-animation:circle <%=duration%> linear infinite;animation:circle <%=duration%> linear infinite;margin:0 auto;">
     <% for(var i = 0; i < 8; i++) { %>
@@ -7,7 +7,7 @@
 </div>
 </TEMPLATE>
 
-<TEMPLATE name="STYLE">
+<TEMPLATE id="STYLE">
 @-webkit-keyframes circle {
     from {transform:rotate(0);}
     to {transform:rotate(360deg);}

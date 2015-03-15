@@ -6,8 +6,8 @@
 define("core/main/router", function(require, exports, module) {
 	var emitter = require('core/lib/emitter');
 	var event = require('core/lib/event');
-	var config = require('core/config').getConfig();
-	var routeRule = '/*controller(/*action)(/*p1)(/*p2)(/*p3)(/*p4)';
+	var config = require('core/config/index');
+	var routeRule = '/*controller(/*action)(/*p1)';
 	var debugMark = 'debug_online';
 	var hashMark = '#!';
 
@@ -216,7 +216,7 @@ define("core/main/router", function(require, exports, module) {
 			_curController = controller;
 			_curAction = action;
 
-			var moduleName = [config.pageModuleDir, controller, '/', action].join('');
+			var moduleName = [config.appName, config.viewName, controller, action].join('/');
 			var navType = NavigationType.NEXT;
 			if(!fromHistory) {
 				if(moduleName == historyStack[historyPointer]) {
