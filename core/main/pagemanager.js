@@ -6,7 +6,7 @@
 define("core/main/pagemanager", function(require, exports, module) {
 	var router = require('core/main/router');
 	var dom = require('core/lib/dom');
-	var config = require('core/config/index');
+	var config = require('core/config');
 	var Page = require('core/main/page');
 	var loader = window.loader;
 	var event = require('core/lib/event');

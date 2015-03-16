@@ -6,7 +6,7 @@
 define("core/main/router", function(require, exports, module) {
 	var emitter = require('core/lib/emitter');
 	var event = require('core/lib/event');
-	var config = require('core/config/index');
+	var config = require('core/config');
 	var routeRule = '/*controller(/*action)(/*p1)';
 	var debugMark = 'debug_online';
 	var hashMark = '#!';

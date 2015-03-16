@@ -2,7 +2,7 @@
  * @fileoverview seajs的封装
  * @author lzhspace@gmail.com 
  */
-defineSeajs(function() {
+defineSeajs("core/lib/sea", function() {
 /**
  * Sea.js 2.3.0 | seajs.org/LICENSE.md
  */

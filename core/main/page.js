@@ -4,7 +4,7 @@
  */
 define("core/main/page", function(require, exports, module) {
 	var event = require('core/lib/event');
-	var config = require('core/config/index');
+	var config = require('core/config');
 	var loading = require('core/widget/loading');
 	var dom = require('core/lib/dom');
 

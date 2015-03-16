@@ -71,7 +71,7 @@ var buildLoader = (function(win, doc, undefined) {
         var config = {
             debug: win.location.href.indexOf('debug_online') > 0,
             appName: 'app',
-            entryModule: 'core/index',
+            entryModule: 'core',
             seajsModule: 'core/lib/sea'
         }
         
@@ -96,7 +96,7 @@ var buildLoader = (function(win, doc, undefined) {
         /**
          * @name 记录JS文件版本
          */
-        if(!userConfig.fileMap) throw '[fileVersion] missing';
+        if(!userConfig.moduleFileMap) throw '[moduleFileMap] missing';
         config.moduleFileMap = userConfig.moduleFileMap;
 
         /**
@@ -180,7 +180,7 @@ var buildLoader = (function(win, doc, undefined) {
      * seajs专用
      * @param {function} seajsMaker seajs构造器
      */
-    var defineSeajs = function(seajsMaker) {
+    var defineSeajs = function(module, seajsMaker) {
         if(loadingModules[config.seajsModule]) {
             localClear(config.seajsModule);
             localSave(config.seajsModule, seajsMaker.toString());
@@ -324,7 +324,7 @@ var buildLoader = (function(win, doc, undefined) {
         var localCode = localGet(config.seajsModule);
         if(localCode) {
             var seajsMaker = win.eval('(' + localCode + ')');
-            defineSeajs(seajsMaker);
+            defineSeajs(config.seajsModule, seajsMaker);
             cb(Status.SUCCESS);
         }
         else {

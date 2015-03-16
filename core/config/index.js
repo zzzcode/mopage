@@ -4,7 +4,7 @@
  * @author lzhspace@gmail.com
  */
 
-define("core/config/index", function(require, exports, module) {
+define("core/config", function(require, exports, module) {
 	var defaultConfig = {
 		'usePageAnimation': false,
 		'viewName': 'view',

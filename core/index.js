@@ -3,14 +3,14 @@
  * @author lzhspace@gmail.com
  */
 
-define("core/index", function(require, exports, module) {
+define("core", function(require, exports, module) {
 	var router = require('core/main/router');
 	var pageManager = require('core/main/pagemanager');
 	var event = require('core/lib/event');
 	var commonLayout = require('core/layout/common');
 	var util = require('core/lib/util');
 	var dom = require('core/lib/dom');
-	var config = require('core/config/index');
+	var config = require('core/config');
 	var loader = window.loader;
 
 	var startup = function() {
@@ -52,7 +52,7 @@ define("core/index", function(require, exports, module) {
 	}
 
 	var initLayout = function(userLayout) {
-		var layout = userLayout || require('core/layout/index');
+		var layout = userLayout || require('core/layout');
 		layout.render();
 		pageManager.setPagesWrapper(dom.query(layout.wrapper));
 	}
