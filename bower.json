@@ -1,0 +1,21 @@
+{
+  "name": "mopage",
+  "version": "0.1.0",
+  "homepage": "https://github.com/Jofix/mopage",
+  "authors": [
+    "Jofix <lzhspace@gmail.com>"
+  ],
+  "description": "core of one simple mobile page solution",
+  "main": ["core/", "page_loader.tpl"],
+  "keywords": [
+    "mopage"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
