@@ -11,6 +11,7 @@ define("core/lib/event", function(require, exports, module) {
 	var eventAttr = 'data-event', globalNamespace = 'global';
 	var eventContainers = {}, handlerInfoMap = {};
 	var curNamespace = '';
+	var clickable = true, clickTimer;
 
 	/**
 	 * @method 获取目标元素
@@ -49,7 +50,7 @@ define("core/lib/event", function(require, exports, module) {
 			eventType = e.type;
 		}
 		eventModule.emit('touch');
-		eventModule.emit('before_' + eventType);
+		eventModule.emit('before' + eventType);
 		var target = getTarget(e);
 		if(!target) return;
 		var eventKey = target.getAttribute(eventAttr);
@@ -62,9 +63,14 @@ define("core/lib/event", function(require, exports, module) {
 					eventModule.emit(eventType, [ target ]);
 				}
 			}
+
+            // 部分浏览器会触发click事件
+            clickable = false;
+            clickTimer && clearTimeout(clickTimer);
+            clickTimer = setTimeout(function() { clickable = true; }, 500);
+
+            e.preventDefault();
 		}
-		e.preventDefault();
-		e.stopPropagation();
 	}
 
 	/**
@@ -103,19 +109,28 @@ define("core/lib/event", function(require, exports, module) {
 	 */
 	var bindPageEvent = function(eventType) {
 		if(eventType == 'tap') {
-			var _isTap = false, _start;
-			bind(document.body, 'touchstart', function() {
-				_isTap = true;
-	            _start = new Date();
+			var isTap = false, hasMove = false, startTime, startX = 0, startY = 0;
+			bind(document.body, 'touchstart', function(e) {
+				hasMove = false;
+				isTap = e.touches.length == 1;
+	            startTime = new Date();
+	            var toucher = e.targetTouches[0];
+	            startX = toucher.pageX;
+	            startY = toucher.pageY;
 			});
 			bind(document.body, 'touchmove', function() {
-				_isTap = false;
+				hasMove = true;
 			});
 			bind(document.body, 'touchend', function(e) {
-				if(_isTap) {
-	                if(new Date() - _start > 300) return;
-	                _basePageHandler(e, 'tap');
+				if(!isTap) return;
+				if(new Date() - startTime > 300) return;
+				if(hasMove) {
+					var toucher = e.changedTouches[0];
+		            var disX = toucher.pageX - startX;
+		            var disY = toucher.pageY - startY;
+		            if(Math.abs(disX) > 5 || Math.abs(disY) > 5) return;
 	            }
+	            _basePageHandler(e, 'tap');
 			});
 		}
 		else {
@@ -239,7 +254,9 @@ define("core/lib/event", function(require, exports, module) {
 	 * @description 部分浏览器不支持touchend的preventDefault取消click事件，qq浏览器就是其中之一
 	 */
 	bind(document.body, 'click', function(e) {
-		e.preventDefault();
+		if(!clickable) {
+			e.preventDefault();
+		}
 	});
 
 

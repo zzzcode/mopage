@@ -70,7 +70,7 @@ define("core/main/router", function(require, exports, module) {
 				location.replace('/' + hashMark + initPath);
 				return;
 			}
-			this.navigate(initPath);
+			this.navigate(initPath, true);
 		},
 
 		/**
